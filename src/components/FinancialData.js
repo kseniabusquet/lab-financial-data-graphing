@@ -13,7 +13,7 @@ import {
 
 
     import { Line } from 'react-chartjs-2' 
-    
+
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -27,6 +27,10 @@ import {
 
 function FinancialData(){
     const[data, setData] = useState(null)
+    const[fromDate, setFromDate] = useState('')
+    const[toDate, setToDate] = useState('')
+
+
 
     const options = {
         responsive: true,
@@ -43,9 +47,12 @@ function FinancialData(){
 
 
     useEffect(() => {
-        const apiURL = 'http://api.coindesk.com/v1/bpi/historical/close.json'
+        let apiURL = 'http://api.coindesk.com/v1/bpi/historical/close.json'
+        if (fromDate && toDate) {
+             apiURL = `${apiURL}?start=${fromDate}&end=${toDate}`
+         }
         axios
-            .get(`${apiURL}`)
+            .get(apiURL)
             .then(response => {
                 const labels = Object.keys(response.data.bpi)
                 const values = labels.map(label => {
@@ -65,10 +72,24 @@ function FinancialData(){
             };
             setData(data)
         })
-    }, [])
+    }, [(fromDate, toDate)])
 
     return (
         <div>
+            <input 
+            type='date'
+            value={fromDate}
+            onChange={(e) => {
+                setFromDate(e.target.value)
+            }}/>
+
+            <input 
+            type='date'
+            value={toDate}
+            onChange={(e) => {
+                setToDate(e.target.value)
+            }}/>     
+
             {data && <Line options={options} data={data}/>}
         </div>
     )
