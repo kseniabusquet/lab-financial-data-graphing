@@ -29,6 +29,7 @@ function FinancialData(){
     const[data, setData] = useState(null)
     const[fromDate, setFromDate] = useState('')
     const[toDate, setToDate] = useState('')
+    const [currency, setCurrency] = useState('USD')
 
 
 
@@ -47,9 +48,9 @@ function FinancialData(){
 
 
     useEffect(() => {
-        let apiURL = 'http://api.coindesk.com/v1/bpi/historical/close.json'
+        let apiURL = `http://api.coindesk.com/v1/bpi/historical/close.json?currency=${currency}`
         if (fromDate && toDate) {
-             apiURL = `${apiURL}?start=${fromDate}&end=${toDate}`
+             apiURL = `${apiURL}&start=${fromDate}&end=${toDate}`
          }
         axios
             .get(apiURL)
@@ -69,10 +70,12 @@ function FinancialData(){
                         backgroundColor: 'rgba(255, 99, 132, 0.5)',
                       }
                     ]
-            };
+            };            
             setData(data)
         })
-    }, [(fromDate, toDate)])
+        .catch((error) => console.log(error))
+        
+    }, [fromDate, toDate, currency])
 
     return (
         <div>
@@ -90,6 +93,13 @@ function FinancialData(){
                 setToDate(e.target.value)
             }}/>     
 
+            <select id="framework" value={currency} onChange={e => {
+                setCurrency(e.target.value)
+            }}>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="BRL">BRL</option>
+            </select>
             {data && <Line options={options} data={data}/>}
         </div>
     )
